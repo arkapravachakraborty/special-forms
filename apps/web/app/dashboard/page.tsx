@@ -323,9 +323,10 @@ export default function Dashboard() {
                                                 <Trash2 className="size-4" />
                                             </button>
                                             <button
+                                                onClick={() => router.push(`/form/${form.id}/submission`)}
                                                 className="h-8.5 px-3 rounded-lg bg-zinc-950 text-white hover:bg-zinc-800 flex items-center justify-center gap-1 text-xs font-bold transition-all cursor-pointer shadow-sm active:scale-[0.98]"
                                             >
-                                                View API
+                                                Responses
                                                 <ArrowUpRight className="size-3.5" />
                                             </button>
                                         </div>
