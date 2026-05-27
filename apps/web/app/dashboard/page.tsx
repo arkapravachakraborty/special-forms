@@ -27,7 +27,7 @@ import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
 import { useUser } from "~/hooks/api/auth"
-import { createForm } from "~/hooks/api/form"
+import { useCreateForm, useListForm } from "~/hooks/api/form"
 
 interface FormItem {
     id: string
@@ -40,11 +40,11 @@ interface FormItem {
 export default function Dashboard() {
     const router = useRouter()
     const { user, isLoading: userLoading } = useUser()
-    const { createFormAsync, isPending: createPending } = createForm()
+    const { createFormAsync, isPending: createPending } = useCreateForm()
+    const { forms: backendForms, isPending: formsLoading } = useListForm()
 
     const [isCreateOpen, setIsCreateOpen] = useState(false)
     const [searchQuery, setSearchQuery] = useState("")
-    const [forms, setForms] = useState<FormItem[]>([])
 
     // Form inputs state
     const [formTitle, setFormTitle] = useState("")
@@ -58,37 +58,6 @@ export default function Dashboard() {
         }
     }, [user, userLoading, router])
 
-    // Load mock initial forms or load from localStorage for persistent demo experience
-    useEffect(() => {
-        const storedForms = localStorage.getItem("special_forms_data")
-        if (storedForms) {
-            try {
-                setForms(JSON.parse(storedForms))
-            } catch (e) {
-                console.error(e)
-            }
-        } else {
-            const initialForms: FormItem[] = [
-                {
-                    id: "f1",
-                    title: "Newsletter Subscription Waitlist",
-                    description: "Capture emails for the upcoming v2.0 product launch campaign.",
-                    submissions: 142,
-                    createdAt: "2026-05-10"
-                },
-                {
-                    id: "f2",
-                    title: "Beta Feedback Survey",
-                    description: "Gather feedback from pilot users regarding performance and UI aesthetics.",
-                    submissions: 38,
-                    createdAt: "2026-05-20"
-                }
-            ]
-            setForms(initialForms)
-            localStorage.setItem("special_forms_data", JSON.stringify(initialForms))
-        }
-    }, [])
-
     const handleCreateFormSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
@@ -99,22 +68,10 @@ export default function Dashboard() {
 
         try {
             // Call backend TRPC mutation
-            const result = await createFormAsync({
+            await createFormAsync({
                 title: formTitle,
                 description: formDesc || undefined
             })
-
-            const newForm: FormItem = {
-                id: result.id,
-                title: formTitle,
-                description: formDesc || undefined,
-                submissions: 0,
-                createdAt: new Date().toISOString().split("T")[0] ?? ""
-            }
-
-            const updatedForms = [newForm, ...forms]
-            setForms(updatedForms)
-            localStorage.setItem("special_forms_data", JSON.stringify(updatedForms))
 
             toast.success("Form Created Successfully!", {
                 description: `"${formTitle}" is now ready to receive submissions.`
@@ -134,13 +91,19 @@ export default function Dashboard() {
     }
 
     const handleDeleteForm = (id: string, title: string) => {
-        const updated = forms.filter(f => f.id !== id)
-        setForms(updated)
-        localStorage.setItem("special_forms_data", JSON.stringify(updated))
-        toast.success("Form Deleted", {
-            description: `"${title}" has been permanently removed.`
+        toast.info("Deletion Not Supported Yet", {
+            description: `Deleting "${title}" is not implemented on the server.`
         })
     }
+
+    // Map backend forms to FormItem structure
+    const forms: FormItem[] = (backendForms || []).map((f) => ({
+        id: f.id,
+        title: f.title,
+        description: f.description || undefined,
+        submissions: 0,
+        createdAt: f.createdAt ? new Date(f.createdAt).toISOString().split("T")[0]! : "",
+    }))
 
     // Filter forms based on search query
     const filteredForms = forms.filter(form =>
@@ -152,12 +115,12 @@ export default function Dashboard() {
     const totalSubmissions = forms.reduce((acc, f) => acc + f.submissions, 0)
     const activeFormsCount = forms.length
 
-    if (userLoading || !user) {
+    if (userLoading || formsLoading || !user) {
         return (
             <div className="min-h-screen w-full flex flex-col justify-center items-center bg-[#FAF9F6] text-zinc-900">
                 <Loader2 className="w-8 h-8 animate-spin text-zinc-900 mb-4" />
                 <span className="text-sm font-semibold tracking-wider text-zinc-500 uppercase">
-                    Securing Workspace...
+                    {userLoading ? "Securing Workspace..." : "Loading Forms..."}
                 </span>
             </div>
         )

@@ -1,6 +1,6 @@
 import { trpc } from "~/trpc/client";
 
-export function createForm() {
+export function useCreateForm() {
     const utils = trpc.useUtils();
     const {
         mutateAsync: createFormAsync,
@@ -12,7 +12,11 @@ export function createForm() {
         isSuccess,
         isPending,
         status,
-    } = trpc.form.createForm.useMutation();
+    } = trpc.form.createForm.useMutation({
+        onSuccess: async () => {
+            await utils.form.invalidate();
+        },
+    });
 
     return {
         createFormAsync,
@@ -21,6 +25,28 @@ export function createForm() {
         failureCount,
         isError,
         isIdle,
+        isSuccess,
+        isPending,
+        status,
+    }
+}
+
+export function useListForm() {
+    const {
+        data: forms,
+        error,
+        failureCount,
+        isError,
+        isSuccess,
+        isPending,
+        status,
+    } = trpc.form.listFormsbyUserId.useQuery();
+
+    return {
+        forms,
+        error,
+        failureCount,
+        isError,
         isSuccess,
         isPending,
         status,
