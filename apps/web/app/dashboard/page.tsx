@@ -16,6 +16,7 @@ import {
     ExternalLink,
     Trash2,
     Edit2,
+    Copy,
     AlertCircle,
     Loader2,
     ArrowUpRight,
@@ -300,6 +301,19 @@ export default function Dashboard() {
                                                 title="Edit Form"
                                             >
                                                 <Edit2 className="size-4" />
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    const url = `${window.location.origin}/form/${form.id}`
+                                                    navigator.clipboard.writeText(url)
+                                                    toast.success("Public URL Copied!", {
+                                                        description: "Form link copied to clipboard. Share it with your respondents!"
+                                                    })
+                                                }}
+                                                className="size-8.5 rounded-lg border border-zinc-200 text-zinc-400 hover:text-zinc-950 hover:bg-zinc-50 flex items-center justify-center transition-colors cursor-pointer"
+                                                title="Copy Public URL"
+                                            >
+                                                <Copy className="size-4" />
                                             </button>
                                             <button
                                                 onClick={() => handleDeleteForm(form.id, form.title)}
