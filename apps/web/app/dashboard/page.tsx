@@ -15,6 +15,7 @@ import {
     LogOut,
     ExternalLink,
     Trash2,
+    Edit2,
     AlertCircle,
     Loader2,
     ArrowUpRight,
@@ -293,6 +294,13 @@ export default function Dashboard() {
                                         </div>
 
                                         <div className="flex gap-2.5">
+                                            <button
+                                                onClick={() => router.push(`/dashboard/form/${form.id}`)}
+                                                className="size-8.5 rounded-lg border border-zinc-200 text-zinc-400 hover:text-zinc-950 hover:bg-zinc-50 flex items-center justify-center transition-colors cursor-pointer"
+                                                title="Edit Form"
+                                            >
+                                                <Edit2 className="size-4" />
+                                            </button>
                                             <button
                                                 onClick={() => handleDeleteForm(form.id, form.title)}
                                                 className="size-8.5 rounded-lg border border-zinc-200 text-zinc-400 hover:text-rose-600 hover:border-rose-200 flex items-center justify-center transition-colors cursor-pointer"
