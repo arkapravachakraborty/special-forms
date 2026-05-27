@@ -87,4 +87,23 @@ export default class UserService {
         }
     }
 
+    public async getUserInfoById(id: string) {
+        // find the user name email password from the user Table
+        const user = await db.select({ id: userTable.id, name: userTable.name, email: userTable.email }).from(userTable).where(eq(userTable.id, id));
+        if (!user || user.length === 0 || !user[0]) {
+            throw new Error("User not found");
+        }
+        return user[0];
+    }
+
+    public async verifyAndDecodeUserToken(token: string) {
+        try {
+            // verify the token using JWT and retuen the userId
+            const { id } = JWT.verify(token, env.JWT_SECRET) as GenerateUserTokenPayloadType;
+            return { id };
+        } catch (error) {
+            throw new Error("Invalid Token");
+        }
+    }
+
 }

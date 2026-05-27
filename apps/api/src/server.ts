@@ -7,7 +7,7 @@ import { generateOpenApiDocument, createOpenApiExpressMiddleware } from "trpc-to
 import { apiReference } from "@scalar/express-api-reference";
 
 import { serverRouter, createContext } from "@repo/trpc/server";
-
+import cookieParser from "cookie-parser";
 import { env } from "./env";
 
 export const app = express();
@@ -24,6 +24,7 @@ app.use(
   }),
 );
 
+app.use(cookieParser());
 
 app.use(express.json());
 
